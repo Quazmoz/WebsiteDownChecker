@@ -9,7 +9,7 @@ to="quinnkid@aol.com,quazmoz@vivaldi.net"
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmsfdgfdgscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
-    then echo -e "To:${to} \nSubject:wmscog.com may be down\nPlease verify: https://wmscog.com" | sendmail
+    then echo -e "Subject:wmscog.com may be down\nPlease verify: https://wmscog.com" | sendmail "quinnkid@aol.com,quazmoz@vivaldi.net"
     else echo "wmscog.com is up"
     fi
 
