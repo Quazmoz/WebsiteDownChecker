@@ -1,29 +1,51 @@
 #!/bin/bash
+subject="mail subject"
+body="Hello World"
+from="me@example.com"
+to="philip.browning@zionusa.org,gabriel.guzman@zionusa.org,quinn.favo@zionusa.org,"
+
+echo -e "Subject:${subject}\n${body}" | sendmail -f "${from}" -t "${to}"
 
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
-    then echo "wmscog.com status changed to $statuscode" | sendmail quazmoz@vivaldi.net
+    then echo "wmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
     else echo "wmscog.com is up"
     fi
 
-statuscode=$(curl --write-out \\n%{http_code} --silent --head https://goibberifbskjd.com)
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://connecticutwmscog.com)
+
+    if [[ "$statuscode" -ne 200 ]] ;
+    then echo "https://connecticutwmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
+    else echo "https://connecticutwmscog.com is up"
+    fi
+
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://floridawmscog.com)
+
+    if [[ "$statuscode" -ne 200 ]] ;
+    then echo "floridawmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
+    else echo "floridawmscog.com is up"
+    fi
+
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmscog.com/wp-admin)
+
+    if [[ "$statuscode" -ne 200 ]] ;
+    then echo "https://wmscog.com/wp-admin may be down, please verify" | sendmail quazmoz@vivaldi.net
+    else echo "https://wmscog.com/wp-admin is up"
+    fi
+
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://newyorkwmscog.com/wp-admin)
+
+    if [[ "$statuscode" -ne 200 ]] ;
+    then echo "https://newyorkwmscog.com/wp-admin may be down, please verify" | sendmail quazmoz@vivaldi.net
+    else echo "https://newyorkwmscog.com/wp-admin is up"
+    fi
+
+: '
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://georgiawmscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
     then echo "wmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
     else echo "wmscog.com is up"
     fi
-
-statuscode=$(curl --write-out \\n%{http_code} --silent --head https://goibberifbskjd.com)
-
-    if [[ "$statuscode" -ne 200 ]] ;
-    then echo "wmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
-    else echo "wmscog.com is up"
-    fi
-
-statuscode=$(curl --write-out \\n%{http_code} --silent --head https://goibberifbskjd.com)
-
-    if [[ "$statuscode" -ne 200 ]] ;
-    then echo "wmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
-    else echo "wmscog.com is up"
-    fi
+'
