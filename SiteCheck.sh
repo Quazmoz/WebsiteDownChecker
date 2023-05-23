@@ -2,14 +2,14 @@
 subject="mail subject"
 body="Hello World"
 from="quinnfavo@gmail.com"
-to="philip.browning@zionusa.org,gabriel.guzman@zionusa.org,quinn.favo@zionusa.org"
+to="quinnkid@aol.com,quazmoz@vivaldi.net"
 
 #echo -e "Subject:${subject}\n${body}" | sendmail -f "${from}" -t "${to}"
 
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmsfdgfdgscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
-    then echo -e "Subject:wmscog.com may be down\nPlease verify: https://wmscog.com" | sendmail quinn.favo@weloveusua.org
+    then echo -e "Subject:wmscog.com may be down\nPlease verify: https://wmscog.com" | sendmail -f "${from}" -t "${to}"
     else echo "wmscog.com is up"
     fi
 
