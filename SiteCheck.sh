@@ -6,10 +6,10 @@ to="philip.browning@zionusa.org,gabriel.guzman@zionusa.org,quinn.favo@zionusa.or
 
 echo -e "Subject:${subject}\n${body}" | sendmail -f "${from}" -t "${to}"
 
-statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmscog.com)
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmsfdgfdgscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
-    then echo "wmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
+    then echo -e "Subject:wmscog.com may be down\nPlease verify" | sendmail quazmoz@vivaldi.net
     else echo "wmscog.com is up"
     fi
 
@@ -23,8 +23,8 @@ statuscode=$(curl --write-out \\n%{http_code} --silent --head https://connecticu
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://floridawmscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
-    then echo "floridawmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
-    else echo "floridawmscog.com is up"
+    then echo "https://floridawmscog.com may be down, please verify" | sendmail quazmoz@vivaldi.net
+    else echo "https://floridawmscog.com is up"
     fi
 
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmscog.com/wp-admin)
