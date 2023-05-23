@@ -1,5 +1,5 @@
 pipeline {
-    agent Secondary
+    agent { label 'secondary' }
     options {
         timeout(time: 1, unit: 'HOURS')
     }
@@ -10,7 +10,7 @@ pipeline {
             }
         }
 
-        stage('Run') {
+        stage('Check sites') {
             steps {
                 sh './SiteCheck.sh'
             }
