@@ -8,12 +8,10 @@ sudo nano /etc/ssmtp/ssmtp.conf
 UseTLS=Yes
 UseSTARTTLS=Yes
 FromLineOverride=YES
-root=quinnfavo@gmail.com
+root=redacted@gmail.com
 mailhub=smtp.gmail.com:587
-AuthUser=quinnfavo@gmail.com
+AuthUser=redacted@gmail.com
 AuthPass=redacted
 hostname=ubuntu-secondary
 
 #https://linuxhint.com/bash_script_send_email/
-
-echo "Subject: hello" | sendmail quazmoz@vivaldi.net
