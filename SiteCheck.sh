@@ -2,7 +2,7 @@
 subject="mail subject"
 body="Hello World"
 from="me@example.com"
-to="philip.browning@zionusa.org,gabriel.guzman@zionusa.org,quinn.favo@zionusa.org,"
+to="philip.browning@zionusa.org,gabriel.guzman@zionusa.org,quinn.favo@zionusa.org"
 
 #echo -e "Subject:${subject}\n${body}" | sendmail -f "${from}" -t "${to}"
 
