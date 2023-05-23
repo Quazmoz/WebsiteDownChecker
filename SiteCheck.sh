@@ -9,7 +9,7 @@ to="philip.browning@zionusa.org,gabriel.guzman@zionusa.org,quinn.favo@zionusa.or
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmsfdgfdgscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
-    then echo -e "Subject:wmscog.com may be down\nPlease verify: https://wmscog.com" | sendmail -t "${to}"
+    then echo -e "Subject:wmscog.com may be down\nPlease verify: https://wmscog.com" | sendmail "${to}"
     else echo "wmscog.com is up"
     fi
 
