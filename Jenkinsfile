@@ -12,7 +12,7 @@ pipeline {
 
         stage('Check sites') {
             steps {
-                sh "chmod +x -R ${env.WORKSPACE}"
+                sh "chmod +x -R '${env.WORKSPACE}'"
                 sh './SiteCheck.sh'
             }
         }
