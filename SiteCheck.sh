@@ -1,6 +1,6 @@
 #!/bin/bash
 
-statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmsfdgfdgscog.com)
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmscog.com)
 
     if [[ "$statuscode" -ne 200 ]] ;
     then echo -e "Subject:wmscog.com may be down\nPlease verify: https://wmscog.com" | sendmail "qmf1@pitt.edu"
