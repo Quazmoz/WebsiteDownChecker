@@ -1,10 +1,4 @@
 #!/bin/bash
-subject="mail subject"
-body="Hello World"
-from="quinnfavo@gmail.com"
-to="quinnkid@aol.com,quazmoz@vivaldi.net"
-
-#echo -e "Subject:${subject}\n${body}" | sendmail -f "${from}" -t "${to}"
 
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmsfdgfdgscog.com)
 
