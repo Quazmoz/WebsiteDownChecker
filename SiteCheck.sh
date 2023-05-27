@@ -21,6 +21,13 @@ statuscode=$(curl --write-out \\n%{http_code} --silent --head https://floridawms
     else echo "https://floridawmscog.com is up"
     fi
 
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://newyorkwmscog.com)
+
+    if [[ "$statuscode" -ne 200 ]] ;
+    then echo "https://newyorkwmscog.com may be down, please verify" | sendmail "qmf1@pitt.edu"
+    else echo "https://newyorkwmscog.com is up"
+    fi
+
 statuscode=$(curl --write-out \\n%{http_code} --silent --head https://wmscog.com/wp-admin)
 
     if [[ "$statuscode" -ne 200 ]] ;
@@ -47,4 +54,11 @@ statuscode=$(curl --write-out \\n%{http_code} --silent --head https://connecticu
     if [[ "$statuscode" -ne 200 ]] ;
     then echo "https://connecticutwmscog.com/wp-admin may be down, please verify" | sendmail "qmf1@pitt.edu"
     else echo "https://connecticutwmscog.com/wp-admin is up"
+    fi
+
+statuscode=$(curl --write-out \\n%{http_code} --silent --head https://weloveuusa.org/wp-login.php)
+
+    if [[ "$statuscode" -ne 200 ]] ;
+    then echo "https://weloveuusa.org/wp-login.php may be down, please verify" | sendmail "qmf1@pitt.edu"
+    else echo "https://weloveuusa.org/wp-login.php is up"
     fi
