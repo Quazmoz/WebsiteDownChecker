@@ -9,6 +9,12 @@ terraform {
   }
 }
 
+variable "fast_polling" {
+  description = "Opt-in to 5-minute critical / 10-minute secondary checks; increases usage and may exceed Free tier limits."
+  type        = bool
+  default     = false
+}
+
 variable "sm_access_token" {
   description = "Grafana Cloud Synthetic Monitoring access token; never commit this token."
   type        = string
@@ -24,15 +30,16 @@ provider "grafana" {
 data "grafana_synthetic_monitoring_probes" "available" {}
 
 locals {
-  # Lower frequency on non-critical static sites reduces Synthetic Monitoring usage.
+  # Budget-safe defaults account for four existing 2-minute probe checks (~86,400/month).
+  # 3 critical sites: 20m budget / 5m fast; 4 secondary sites: 60m budget / 10m fast.
   websites = {
-    consultant     = { url = "https://consultant.quinnfavo.com", frequency_ms = 300000 }
-    minddock       = { url = "https://minddock.quinnfavo.com", frequency_ms = 300000 }
-    petcaredesk    = { url = "https://petcaredesk.quinnfavo.com", frequency_ms = 300000 }
-    devopstoolkit  = { url = "https://devopstoolkit.quinnfavo.com", frequency_ms = 600000 }
-    profile        = { url = "https://profile.quinnfavo.com", frequency_ms = 600000 }
-    ai             = { url = "https://ai.quinnfavo.com", frequency_ms = 600000 }
-    main           = { url = "https://quinnfavo.com", frequency_ms = 600000 }
+    consultant     = { url = "https://consultant.quinnfavo.com", budget_frequency_ms = 1200000, fast_frequency_ms = 300000 }
+    minddock       = { url = "https://minddock.quinnfavo.com", budget_frequency_ms = 1200000, fast_frequency_ms = 300000 }
+    petcaredesk    = { url = "https://petcaredesk.quinnfavo.com", budget_frequency_ms = 1200000, fast_frequency_ms = 300000 }
+    devopstoolkit  = { url = "https://devopstoolkit.quinnfavo.com", budget_frequency_ms = 3600000, fast_frequency_ms = 600000 }
+    profile        = { url = "https://profile.quinnfavo.com", budget_frequency_ms = 3600000, fast_frequency_ms = 600000 }
+    ai             = { url = "https://ai.quinnfavo.com", budget_frequency_ms = 3600000, fast_frequency_ms = 600000 }
+    main           = { url = "https://quinnfavo.com", budget_frequency_ms = 3600000, fast_frequency_ms = 600000 }
   }
 }
 
@@ -42,7 +49,7 @@ resource "grafana_synthetic_monitoring_check" "website" {
   job       = each.key
   target    = each.value.url
   enabled   = true
-  frequency = each.value.frequency_ms
+  frequency = var.fast_polling ? each.value.fast_frequency_ms : each.value.budget_frequency_ms
   timeout   = 5000
 
   probes = [
