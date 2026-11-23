@@ -26,7 +26,13 @@ This is the **remaining collection layer** for the existing Grafana Cloud dashbo
 
 ## Frequency, alerts, and cost
 
-Three higher-priority services use a 5-minute interval. Four less-critical sites use a 10-minute interval. All checks use one NorthVirginia public probe, HTTP GET, valid HTTP 200 after redirects, and a 5-second timeout. These checks need about **43,200 API test executions per 30-day month**, assuming each run lasts less than one minute. This **does not include your four pre-existing synthetic checks** and other sources of usage. The current Grafana Cloud Free tier includes 100k API test executions monthly; check your plan and consumption before applying. A 3-minute alert pending period is *additional* to the check polling interval, so actual time-to-detection may exceed 3 minutes.
+Grafana already runs four legacy checks that emit roughly 30 samples/hour each, equivalent to **86,400 API test executions per 30-day month** if their schedule remains constant. Grafana Cloud's current Free tier includes 100,000 API test executions per month.
+
+To avoid unexpected charges, the **default** in `main.tf` uses **20-minute polling for three critical websites** and **60-minute polling for four secondary websites**, one NorthVirginia public probe per check. This adds approximately **9,360 monthly executions**, or **95,760 total** combined with the four legacy checks, leaving a limited 4,240-execution buffer. Check your account's actual plan, existing SM usage, and allowance before applying. All checks use HTTP GET, HTTP 200 after redirects, and 5-second timeouts.
+
+For faster detection on a paid plan or after reducing legacy usage, use `terraform -chdir=grafana-cloud apply -var='fast_polling=true'`: this configures **5 minutes for critical sites** and **10 minutes for secondary sites**, consuming approximately **43,200 additional monthly executions**. That would bring the projected total to **129,600**, *over* the current Free tier limit.
+
+The 3-minute outage alert pending time starts only after a failed check result. A 20-minute or 60-minute polling interval can therefore produce considerably longer real-world outage detection times. Increase frequency only after checking billing.
 
 ### Existing rules (no duplicate Terraform rules created)
 
