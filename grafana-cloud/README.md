@@ -5,9 +5,30 @@ This is the **remaining collection layer** for the existing Grafana Cloud dashbo
 - [Production Websites dashboard](https://flyingpork15.grafana.net/d/quazmoz-websites)
 - [17 website alert rules](https://flyingpork15.grafana.net/alerting/list) in folder `Quazmoz Production Apps`
 - Contact point: `Quazmoz App Monitoring` → `quazmoz@vivaldi.net`
-- Existing WMSCOG notification routing and checks are **not** modified.
+- Four pre-existing WMSCOG/related synthetic checks **remain active and need to be deleted** to reclaim Free tier capacity. The cleanup script below targets only those four. Their historical notification contact/policy do not consume synthetic-check executions.
 
 **The seven HTTP synthetic checks are NOT live yet.** The linked Grafana MCP connection can create dashboard and rule resources but cannot access the separate Synthetic Monitoring API; datasource-proxy attempts returned HTTP 502. This folder allows one manual, idempotent Terraform apply once a Synthetic Monitoring API token is available. Do not call this production monitoring active until `probe_success` appears for these sites.
+
+## Remove legacy checks to recover Free tier capacity (priority)
+
+Four pre-existing checks (Pennsylvania, Virginia, Dominican Republic, and WeLoveU) still emit **30 probe results/hour each**, approximately **86,400 executions/month combined**. The connected Grafana MCP cannot reach the separate Synthetic Monitoring API for these checks; they have **not** been deleted automatically. You must do ONE of the following before enabling the faster Quazmoz website polling:
+
+- **Simplest:** Open [Grafana Synthetics → Checks](https://flyingpork15.grafana.net/a/grafana-synthetic-monitoring-app/checks), find the four jobs, and delete each. Disabling immediately also stops executions, but deletion cleans up the configuration.
+- **Repeatable cleanup (only those four hostnames):** use the checked-in standard-library-only Python script with a Synthetic Monitoring API access token. First preview, then apply, then verify:
+  ```bash
+  # Generate a Synthetic Monitoring token in Grafana Configuration → Access tokens.
+  # Supply this locally. Never commit, log, or paste it into chat.
+  export SM_ACCESS_TOKEN='TOKEN_FROM_GRAFANA'
+  python3 grafana-cloud/remove_legacy_checks.py
+  python3 grafana-cloud/remove_legacy_checks.py --apply
+  unset SM_ACCESS_TOKEN
+  ```
+
+The script matches **exact hostnames**, lists check IDs and job names, requires explicit `--apply`, deletes matching checks through the documented API, then re-lists to verify none remain. It does not touch Quazmoz application checks.
+
+After deletion, the synthetic execution forecast for the four legacy jobs falls from **86,400/month to zero new tests**, though historical consumption within the current billing period remains on the usage report.
+
+The old `WMSCOG` contact point and root notification policy still exist. They don't generate probe executions and cannot be removed through this Grafana connection (API returned HTTP 403). After removing checks, optionally clean up the contact/policy in [Grafana Alerting → Notification policies](https://flyingpork15.grafana.net/alerting/routes) and [Contact points](https://flyingpork15.grafana.net/alerting/notifications), setting the default to `Quazmoz App Monitoring` first. Existing Quazmoz rules explicitly select their contact point.
 
 ## Activate the checks
 
@@ -30,7 +51,7 @@ Grafana already runs four legacy checks that emit roughly 30 samples/hour each, 
 
 To avoid unexpected charges, the **default** in `main.tf` uses **20-minute polling for three critical websites** and **60-minute polling for four secondary websites**, one NorthVirginia public probe per check. This adds approximately **9,360 monthly executions**, or **95,760 total** combined with the four legacy checks, leaving a limited 4,240-execution buffer. Check your account's actual plan, existing SM usage, and allowance before applying. All checks use HTTP GET, HTTP 200 after redirects, and 5-second timeouts.
 
-For faster detection on a paid plan or after reducing legacy usage, use `terraform -chdir=grafana-cloud apply -var='fast_polling=true'`: this configures **5 minutes for critical sites** and **10 minutes for secondary sites**, consuming approximately **43,200 additional monthly executions**. That would bring the projected total to **129,600**, *over* the current Free tier limit.
+After verifying ALL FOUR legacy checks are deleted, use `terraform -chdir=grafana-cloud apply -var='fast_polling=true'`: this configures **5 minutes for critical sites** and **10 minutes for secondary sites**, consuming approximately **43,200 additional monthly executions**. After removal of all four legacy jobs, the projected new usage becomes **43,200/month** from your seven Quazmoz sites, under the **100,000/month** Free tier cap if there are no other API checks. Before legacy deletion, the same configuration would total around **129,600/month** and exceed the allowance.
 
 The 3-minute outage alert pending time starts only after a failed check result. A 20-minute or 60-minute polling interval can therefore produce considerably longer real-world outage detection times. Increase frequency only after checking billing.
 
