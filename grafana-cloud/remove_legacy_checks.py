@@ -3,6 +3,7 @@
 
 Reads a Grafana Synthetic Monitoring API access token from SM_ACCESS_TOKEN.
 Does not mutate anything unless --apply is supplied. Never prints the token.
+Uses Grafana Cloud Synthetic Monitoring REST API, not the Grafana dashboard API.
 Uses only Python's standard library.
 """
 
@@ -41,7 +42,9 @@ def api(method: str, path: str, base: str, token: str):
 
 
 def list_checks(base: str, token: str) -> list:
-    for endpoint in ("/api/v1/check/list", "/api/v1/check"):
+    # The current Grafana API documentation uses /api/v1/check.
+    # Keep the legacy /api/v1/check/list endpoint as a compatibility fallback.
+    for endpoint in ("/api/v1/check", "/api/v1/check/list"):
         try:
             result = api("GET", endpoint, base, token)
             if isinstance(result, list):
@@ -61,7 +64,8 @@ def matching(check: dict) -> bool:
         return False
     # Exact host match; never match an arbitrary subdomain or similarly named domain.
     parsed = urlsplit(target if "://" in target else f"https://{target}")
-    return (parsed.hostname or "").lower() in TARGET_HOSTS
+    # Reject any future malformed or non-HTTP protocols rather than guessing.
+    return parsed.scheme.lower() in {"http", "https"} and (parsed.hostname or "").lower() in TARGET_HOSTS
 
 
 def main() -> int:
@@ -85,11 +89,15 @@ def main() -> int:
         if not args.apply:
             print("DRY RUN ONLY. Re-run with --apply to delete exactly the listed checks.")
             return 0
+        deleted_ids = set()
         for check in selected:
             check_id = str(check.get("id", ""))
             if not check_id.isdecimal():
                 raise RuntimeError(f"Refusing deletion of check with invalid id: {check_id!r}")
+            if check_id in deleted_ids:
+                continue
             api("DELETE", f"/api/v1/check/delete/{quote(check_id)}", base, token)
+            deleted_ids.add(check_id)
             print(f"Deleted {check.get('target')!r} (id {check_id}).")
         remaining = [check for check in list_checks(base, token) if isinstance(check, dict) and matching(check)]
         if remaining:
